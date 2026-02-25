@@ -1,68 +1,83 @@
 # 🎵 VIQ – Release Landing Page Generator
 
-Outil interne pour générer des landing pages de sortie musicale, prêtes à être uploadées sur GitHub Pages en quelques secondes.
+Internal tool to generate music release landing pages, ready to be uploaded to GitHub Pages in seconds.
 
 ---
 
-## Fonctionnalités
+## 🚀 Features
 
-### Générateur
-- **Auto-remplissage des liens** via l'API Odesli — colle un lien Spotify (ou autre) et tous les liens plateformes se remplissent automatiquement
-- **12 plateformes supportées** : Spotify, Apple Music, YouTube, YouTube Music, Deezer, SoundCloud, Amazon Music, Tidal, Bandcamp, Pandora, Anghami, Store
-- **Optimisation de la cover** — redimensionnement automatique en 1000×1000px JPEG à l'import, avec prévisualisation
-- **Extraction de couleur dominante** — la couleur primaire de la cover est extraite automatiquement et injectée dans la landing et l'OG
-- **Génération OG image** — une image 1200×630px est générée automatiquement pour Discord, Facebook, Twitter/X
-- **Aperçu live** — la landing et l'OG se mettent à jour en temps réel sans avoir à regénérer
-- **Slug auto** — généré depuis le titre de la chanson, personnalisable
-- **Validation des URLs** — indicateur visuel vert/rouge sur chaque lien
-- **Nettoyage des URLs** — suppression automatique des paramètres de tracking (utm, si…) au blur
-- **Duplication de config** — clone une page en gardant artiste + réseaux sociaux, vide titre + liens
-- **Export ZIP** — dossier `[slug]/` contenant `index.html`, `cover.jpg` et `og.jpg`
-- **Drag & drop** sur la zone cover
+### 🛠 Generator
 
-### Landing page générée
-- **Particules animées** flottant vers le haut, tintées dans la couleur de la cover
-- **Animation d'entrée** sur la cover (zoom + fade)
-- **Hover zoom** sur la cover
-- **Layout responsive** — optimisé mobile et desktop
-- **Fond dynamique** — cover floue en background avec overlay sombre
-- **Bouton Share** — natif sur mobile (Web Share API), copie le lien en fallback
-- **Réseaux sociaux** — Instagram, TikTok, Facebook, site web
-- **Favicon** = cover de la chanson
-- **Balises OG complètes** — og:image, og:title, og:description, twitter:card, canonical
-
-### OG Image
-- Cover en plein bord droit, fondue sur la gauche
-- Fond = cover floue sur toute l'image
-- Nom de l'artiste en grand (serif), titre en light
-- Ligne décorative en couleur primaire
-- Type de release en lettres espacées
-- Barre de couleur en dégradé en bas
-- Domaine `viqmusic.net` discret en bas à gauche
+- **Auto-fill links** via the Odesli API — paste a Spotify (or other platform) link and all platform links are filled automatically  
+- **12 supported platforms**: Spotify, Apple Music, YouTube, YouTube Music, Deezer, SoundCloud, Amazon Music, Tidal, Bandcamp, Pandora, Anghami, Store  
+- **Cover optimization** — automatic resize to 1000×1000px JPEG on import, with preview  
+- **Dominant color extraction** — the primary color of the cover is automatically extracted and injected into the landing page and OG image  
+- **OG image generation** — a 1200×630px image is automatically generated for Discord, Facebook, Twitter/X  
+- **Live preview** — the landing page and OG update in real time without regenerating  
+- **Auto slug** — generated from the song title, customizable  
+- **URL validation** — green/red visual indicator for each link  
+- **URL cleaning** — automatic removal of tracking parameters (utm, etc.) on blur  
+- **Config duplication** — clone a page while keeping artist + social links, clearing title + release links  
+- **ZIP export** — generates a `[slug]/` folder containing `index.html`, `cover.jpg`, and `og.jpg`  
+- **Drag & drop** support for the cover area  
 
 ---
 
-## Structure du ZIP généré
+### 🌐 Generated Landing Page
 
-```
+- **Animated particles** floating upward, tinted with the cover’s primary color  
+- **Entry animation** on the cover (zoom + fade)  
+- **Hover zoom** effect on the cover  
+- **Responsive layout** — optimized for mobile and desktop  
+- **Dynamic background** — blurred cover in background with dark overlay  
+- **Share button** — native on mobile (Web Share API), link copy fallback  
+- **Social links** — Instagram, TikTok, Facebook, website  
+- **Favicon** = release cover  
+- **Full Open Graph tags** — `og:image`, `og:title`, `og:description`, `twitter:card`, `canonical`
+
+---
+
+### 🖼 OG Image
+
+- Cover aligned to the right edge, softly faded on the left  
+- Background = blurred cover across the entire image  
+- Artist name large (serif), title in light weight  
+- Decorative line in the primary color  
+- Release type in spaced lettering  
+- Gradient color bar at the bottom  
+- Subtle `viqmusic.net` domain at bottom left  
+
+---
+
+## 📦 Generated ZIP Structure
+
 [slug]/
-├── index.html   ← landing page complète
-├── cover.jpg    ← pochette optimisée 1000×1000
-└── og.jpg       ← image OG 1200×630 pour les réseaux
-```
+├── index.html ← complete landing page
+├── cover.jpg ← optimized 1000×1000 cover
+└── og.jpg ← 1200×630 OG image for social sharing
 
 ---
 
-## Déploiement
+## 🚀 Deployment
 
-1. Générer le ZIP depuis le générateur
-2. Décompresser et uploader le dossier `[slug]/` dans le repo GitHub `releases`
-3. La page est live sur `go.viqmusic.net/[slug]`
-4. Pour forcer le re-scrape Discord/Facebook : [opengraph.xyz](https://www.opengraph.xyz)
+1. Generate the ZIP from the generator  
+2. Unzip and upload the `[slug]/` folder into the `releases` GitHub repository  
+3. The page goes live at: https://go.viqmusic.net/[slug] 
 
 ---
 
-## Stack
+## 🧠 Stack
 
-Vanilla HTML/CSS/JS — zéro dépendance serveur, zéro framework.  
-Librairies : `JSZip` (génération ZIP côté client) · `Odesli API` via `corsproxy.io` (auto-remplissage liens) · `SimpleIcons CDN` (logos plateformes)
+Vanilla HTML / CSS / JavaScript  
+Zero server dependencies. Zero frameworks.
+
+Libraries used:
+- `JSZip` — client-side ZIP generation  
+- `Odesli API` via `corsproxy.io` — link auto-fill  
+- `SimpleIcons CDN` — platform logos  
+
+---
+
+## ⚠️ License
+
+© 2026 VIQ — All Rights Reserved.
