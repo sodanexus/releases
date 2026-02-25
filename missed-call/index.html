@@ -8,17 +8,17 @@
   <meta property="og:title" content="VIQ – missed call"/>
   <meta property="og:description" content="Listen to missed call by VIQ on Spotify, Apple Music, YouTube and more. Stream now."/>
   <meta property="og:type" content="website"/>
-  <meta property="og:url" content="https://go.viqmusic.net/[object HTMLInputElement]/"/>
-     <meta property="og:image" content="https://go.viqmusic.net/[object HTMLInputElement]/og.jpg"/>
+  <meta property="og:url" content="https://go.viqmusic.net/missed-call/"/>
+     <meta property="og:image" content="https://go.viqmusic.net/missed-call/og.jpg"/>
      <meta property="og:image:type" content="image/jpeg"/>
      <meta property="og:image:width" content="1200"/>
      <meta property="og:image:height" content="630"/>
-    <link rel="canonical" href="https://go.viqmusic.net/[object HTMLInputElement]/"/>
-     <meta name="twitter:url" content="https://go.viqmusic.net/[object HTMLInputElement]/"/>
+    <link rel="canonical" href="https://go.viqmusic.net/missed-call/"/>
+     <meta name="twitter:url" content="https://go.viqmusic.net/missed-call/"/>
   <meta name="twitter:card" content="summary_large_image"/>
   <meta name="twitter:title" content="VIQ – missed call"/>
   <meta name="twitter:description" content="Listen to missed call by VIQ on Spotify, Apple Music, YouTube and more. Stream now."/>
-  <meta name="twitter:image" content="https://go.viqmusic.net/[object HTMLInputElement]/og.jpg"/>
+  <meta name="twitter:image" content="https://go.viqmusic.net/missed-call/og.jpg"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="cover.jpg"/>
@@ -248,22 +248,9 @@ async function shareOrCopy(btn){
     url: window.location.href
   };
 
-  // Try native share first (mobile)
+  // Try native share first (mobile) — partage le lien, pas l'image
   if (navigator.share){
     try{
-      // Try to include the cover image if file sharing is supported
-      try{
-        const res = await fetch('cover.jpg', { cache: 'force-cache' });
-        const blob = await res.blob();
-        const file = new File([blob], 'cover.jpg', { type: blob.type || 'image/jpeg' });
-        if (navigator.canShare && navigator.canShare({ files: [file] })){
-          await navigator.share({ ...shareData, files: [file] });
-          return;
-        }
-      }catch(_){
-        // ignore and fallback to text/url share
-      }
-
       await navigator.share(shareData);
       return;
     }catch(_){
