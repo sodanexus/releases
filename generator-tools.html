@@ -1444,7 +1444,7 @@ function buildHTML(artist, title, type, coverSrc, primary, orb2, darkBg, links, 
         <img class="cover" src="cover.jpg" alt="${title} cover"/>
         <div class="cover-gradient"></div>
         <div class="cover-meta">
-          <div class="artist">${artist}</div>
+          <div class="artist" style="font-size:${artist.length > 40 ? '1rem' : artist.length > 28 ? '1.3rem' : artist.length > 18 ? '1.55rem' : '1.8rem'};letter-spacing:${artist.length > 30 ? '-0.03em' : artist.length > 20 ? '0em' : '0.02em'};word-break:break-word;white-space:normal;padding:0 .75rem;">${artist}</div>
           <div class="track">${title} · ${type}</div>
         </div>
       </div>
@@ -1957,32 +1957,42 @@ async function generateOGImage(artist, title, type, coverSrc, primaryColor) {
       ctx.fillText(type.toUpperCase(), textX, startY + 32);
       ctx.letterSpacing = '0';
 
-      // Nom artiste — grand, serif, avec retour à la ligne si trop long
+      // Nom artiste — adaptatif multi-lignes
       ctx.fillStyle = '#ffffff';
       ctx.shadowColor = 'rgba(0,0,0,0.8)';
       ctx.shadowBlur = 20;
-      let aSize = 88;
-      ctx.font = 'bold ' + aSize + 'px Georgia, serif';
-      while (ctx.measureText(artist).width > textMaxW && aSize > 48) {
-        aSize -= 3;
-        ctx.font = 'bold ' + aSize + 'px Georgia, serif';
-      }
-      let artistLines = [artist];
-      if (ctx.measureText(artist).width > textMaxW) {
-        const words = artist.split(' ');
-        const splitIdx = Math.ceil(words.length / 2);
-        let line1 = words.slice(0, splitIdx).join(' ');
-        let line2 = words.slice(splitIdx).join(' ');
-        while ((ctx.measureText(line1).width > textMaxW || ctx.measureText(line2).width > textMaxW) && aSize > 28) {
-          aSize -= 2;
-          ctx.font = 'bold ' + aSize + 'px Georgia, serif';
+
+      function wrapArtist(name, maxW, fontSize) {
+        ctx.font = 'bold ' + fontSize + 'px Georgia, serif';
+        const words = name.split(' ');
+        const lines = [];
+        let current = '';
+        for (const word of words) {
+          const test = current ? current + ' ' + word : word;
+          if (ctx.measureText(test).width > maxW && current) {
+            lines.push(current);
+            current = word;
+          } else {
+            current = test;
+          }
         }
-        artistLines = [line1, line2];
+        if (current) lines.push(current);
+        return lines;
       }
+
+      let aSize = 72;
+      let artistLines = wrapArtist(artist, textMaxW, aSize);
+      // Réduire jusqu'à ce que chaque ligne rentre ET max 3 lignes
+      while (aSize > 24 && (artistLines.some(l => { ctx.font = 'bold ' + aSize + 'px Georgia, serif'; return ctx.measureText(l).width > textMaxW; }) || artistLines.length > 3)) {
+        aSize -= 2;
+        artistLines = wrapArtist(artist, textMaxW, aSize);
+      }
+      ctx.font = 'bold ' + aSize + 'px Georgia, serif';
+      ctx.letterSpacing = artist.length > 30 ? '-2px' : artist.length > 20 ? '0px' : '1px';
       artistLines.forEach((line, i) => {
-        ctx.fillText(line, textX, startY + 32 + aSize + 10 + i * (aSize + 6));
+        ctx.fillText(line, textX, startY + 32 + aSize + 10 + i * (aSize + 8));
       });
-      const artistBlockH = artistLines.length * (aSize + 6);
+      const artistBlockH = artistLines.length * (aSize + 8);
       ctx.shadowBlur = 0;
 
       // Titre chanson
