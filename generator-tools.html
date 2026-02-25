@@ -1,0 +1,2070 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VIQ – Landing Page Generator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0c0c0e;
+      --surface: #141416;
+      --surface2: #1c1c1f;
+      --border: rgba(255,255,255,0.07);
+      --accent: #ff6b1a;
+      --accent2: #ff2d55;
+      --text: #f0ede8;
+      --muted: rgba(245,240,235,0.75);
+      --success: #30d158;
+      --mono: 'DM Mono', monospace;
+    }
+
+    html, body {
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Syne', sans-serif;
+    }
+
+    /* ── Grain overlay ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      opacity: 0.03;
+    }
+
+    /* ── Layout ── */
+    .app { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 420px; min-height: 100vh; }
+
+    /* ── Left panel (form) ── */
+    .panel-form {
+      padding: 3rem;
+      border-right: 1px solid var(--border);
+      overflow-y: auto;
+    }
+
+    .logo {
+      font-size: .7rem;
+      font-family: var(--mono);
+      color: var(--muted);
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      margin-bottom: 2.5rem;
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+    }
+    .logo::before {
+      content: '';
+      width: 28px; height: 2px;
+      background: var(--accent);
+      display: block;
+    }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: .5rem;
+    }
+    h1 span { color: var(--accent); }
+
+    .subtitle {
+      font-size: .85rem;
+      color: var(--muted);
+      margin-bottom: 3rem;
+      font-family: var(--mono);
+    }
+
+    /* ── Sections ── */
+    .section {
+      margin-bottom: 2.5rem;
+    }
+    .section-title {
+      font-size: .65rem;
+      font-family: var(--mono);
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1rem;
+      padding-bottom: .5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* ── Form fields ── */
+    .field { margin-bottom: 1rem; }
+    .field label {
+      display: block;
+      font-size: .72rem;
+      font-family: var(--mono);
+      color: var(--muted);
+      margin-bottom: .4rem;
+      letter-spacing: .05em;
+    }
+    .field input, .field select {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: .85rem;
+      padding: .65rem .9rem;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .field input:focus, .field select:focus {
+      border-color: var(--accent);
+    }
+    .field input::placeholder { color: var(--muted); }
+    .field select option { background: #1c1c1f; }
+
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+
+    /* ── Cover upload ── */
+    .cover-upload {
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .cover-upload:hover { border-color: var(--accent); background: rgba(255,107,26,0.04); }
+    .cover-upload input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+    .cover-upload .icon { font-size: 2rem; margin-bottom: .5rem; }
+    .cover-upload .hint { font-size: .75rem; font-family: var(--mono); color: var(--muted); }
+    .cover-upload .preview {
+      width: 80px; height: 80px; object-fit: cover;
+      border-radius: 8px; margin: 0 auto .75rem;
+      display: none;
+    }
+    .cover-upload.has-file .preview { display: block; }
+    .cover-upload.has-file .icon { display: none; }
+
+    /* ── Platform links ── */
+    .platform-list { display: flex; flex-direction: column; gap: .6rem; }
+    .platform-row {
+      display: grid;
+      grid-template-columns: 28px 110px 1fr 14px;
+      align-items: center;
+      gap: .6rem;
+    }
+    .platform-toggle {
+      width: 28px; height: 28px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      cursor: pointer;
+      display: grid; place-items: center;
+      font-size: .7rem;
+      color: var(--muted);
+      transition: all .2s;
+      flex-shrink: 0;
+    }
+    .platform-toggle.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+    .platform-name {
+      font-size: .8rem;
+      font-family: var(--mono);
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .platform-row input {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: .78rem;
+      padding: .5rem .75rem;
+      outline: none;
+      width: 100%;
+      transition: border-color .2s;
+    }
+    .platform-row input:focus { border-color: var(--accent); }
+    .platform-row input:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    /* ── Socials ── */
+    .social-list { display: flex; flex-direction: column; gap: .6rem; }
+    .social-row { display: grid; grid-template-columns: 100px 1fr; gap: .6rem; align-items: center; }
+    .social-label { font-size: .78rem; font-family: var(--mono); color: var(--muted); }
+    .social-row input {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: .78rem;
+      padding: .5rem .75rem;
+      outline: none;
+      width: 100%;
+      transition: border-color .2s;
+    }
+    .social-row input:focus { border-color: var(--accent); }
+
+    /* ── Generate button ── */
+    .btn-generate {
+      width: 100%;
+      padding: 1rem;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .2s, transform .15s;
+      margin-top: 1rem;
+      letter-spacing: .03em;
+    }
+    .btn-generate:hover { background: #ff8040; transform: translateY(-1px); }
+    .btn-generate:active { transform: translateY(0); }
+
+    /* ── Right panel (preview) ── */
+    .panel-preview {
+      background: var(--surface);
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .preview-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .preview-header span {
+      font-size: .65rem;
+      font-family: var(--mono);
+      color: var(--muted);
+      letter-spacing: .15em;
+      text-transform: uppercase;
+    }
+    .btn-download {
+      padding: .45rem 1rem;
+      background: var(--success);
+      color: #000;
+      border: none;
+      border-radius: 6px;
+      font-family: var(--mono);
+      font-size: .75rem;
+      font-weight: 400;
+      cursor: pointer;
+      transition: opacity .2s;
+      display: none;
+    }
+    .btn-download:hover { opacity: .85; }
+    .btn-download.visible { display: block; }
+
+    .preview-frame-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      overflow: hidden;
+    }
+
+    /* Phone mockup */
+        .phone-mockup {
+      width: 280px;
+      height: 560px;
+      background: linear-gradient(145deg, #111, #000);
+      border-radius: 40px;
+      border: 8px solid #2a2a2a;
+      box-shadow: 0 0 0 1px #3a3a3a, 0 40px 80px rgba(0,0,0,.8);
+      overflow: hidden;
+      position: relative;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      isolation: isolate;
+    }
+    .phone-notch {
+      position: absolute;
+      top: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 100px; height: 26px;
+      background: #000;
+      border-radius: 0 0 18px 18px;
+      z-index: 10;
+    }
+        .phone-mockup iframe {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 390px;
+      height: 780px;
+      border: none;
+      transform: translate(-50%, -50%) scale(var(--phone-scale, 0.718));
+      transform-origin: center center;
+      pointer-events: none;
+    }
+    /* ── Phone premium effects ─────────────────────────────────────────────── */
+    /* Micro inner shadow for depth */
+    .phone-mockup::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      border-radius:32px;
+      pointer-events:none;
+      z-index:5;
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,0.06),
+        inset 0 12px 26px rgba(0,0,0,0.55),
+        inset 0 -18px 30px rgba(0,0,0,0.65);
+    }
+
+    /* Subtle animated screen reflection */
+    .phone-mockup::before{
+      content:"";
+      position:absolute;
+      inset:-25%;
+      pointer-events:none;
+      z-index:6;
+      border-radius:60px;
+      background:
+        linear-gradient(120deg,
+          rgba(255,255,255,0.00) 32%,
+          rgba(255,255,255,0.12) 42%,
+          rgba(255,255,255,0.00) 52%);
+      transform: translateX(-35%) translateY(-10%) rotate(-8deg);
+      animation: phoneSheen 6.5s ease-in-out infinite;
+      mix-blend-mode: screen;
+      opacity:0.65;
+      filter: blur(0.2px);
+    }
+
+    @keyframes phoneSheen{
+      0%   { transform: translateX(-42%) translateY(-14%) rotate(-8deg); opacity:0.45; }
+      40%  { transform: translateX(6%)   translateY(2%)   rotate(-8deg); opacity:0.75; }
+      60%  { transform: translateX(18%)  translateY(6%)   rotate(-8deg); opacity:0.55; }
+      100% { transform: translateX(-42%) translateY(-14%) rotate(-8deg); opacity:0.45; }
+    }
+
+    /* Keep notch above reflections */
+    .phone-notch{ z-index: 12; }
+    .phone-mockup iframe{ z-index: 4; }
+
+
+    .preview-empty {
+      text-align: center;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: .8rem;
+      line-height: 1.8;
+    }
+    .preview-empty .big { font-size: 2.5rem; margin-bottom: 1rem; display: block; }
+
+    /* ── Output modal ── */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 100;
+      background: rgba(0,0,0,.30);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+      max-width: 560px;
+      width: 100%;
+      animation: fadeUp .3s cubic-bezier(.22,1,.36,1);
+    }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+    .modal h2 { font-size: 1.4rem; margin-bottom: .5rem; }
+    .modal h2 span { color: var(--success); }
+    .modal p { font-size: .82rem; color: var(--muted); font-family: var(--mono); margin-bottom: 1.5rem; line-height: 1.7; }
+    .modal-actions { display: flex; gap: .75rem; flex-wrap: wrap; }
+    .btn-modal {
+      padding: .65rem 1.25rem;
+      border-radius: 8px;
+      border: none;
+      font-family: 'Syne', sans-serif;
+      font-weight: 600;
+      font-size: .85rem;
+      cursor: pointer;
+      transition: opacity .2s;
+    }
+    .btn-modal:hover { opacity: .85; }
+    .btn-modal.primary { background: var(--success); color: #000; }
+    .btn-modal.secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+
+    /* ── OG Preview ── */
+    .og-preview-wrap {
+      padding: 1rem 1.5rem 1.25rem;
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .og-preview-label {
+      font-size: .6rem;
+      font-family: var(--mono);
+      color: var(--muted);
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      margin-bottom: .6rem;
+    }
+    .og-preview-img {
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      display: none;
+      aspect-ratio: 1200/630;
+      object-fit: cover;
+    }
+    .og-preview-img.visible { display: block; }
+    .og-placeholder {
+      width: 100%;
+      aspect-ratio: 1200/630;
+      background: var(--surface2);
+      border-radius: 8px;
+      border: 1px dashed var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .7rem;
+      font-family: var(--mono);
+      color: var(--muted);
+    }
+
+    /* ── Duplicate btn ── */
+    .btn-duplicate {
+      width: 100%;
+      padding: .75rem;
+      background: var(--surface2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-family: 'Syne', sans-serif;
+      font-size: .85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s, border-color .2s;
+      margin-top: .75rem;
+      letter-spacing: .03em;
+    }
+    .btn-duplicate:hover { background: var(--surface); border-color: rgba(255,255,255,0.15); }
+
+    /* ── OG Preview ── */
+    .og-preview-wrap { padding: 1rem 1.5rem 1.25rem; border-top: 1px solid var(--border); flex-shrink: 0; }
+    .og-preview-label { font-size: .6rem; font-family: var(--mono); color: var(--muted); letter-spacing: .15em; text-transform: uppercase; margin-bottom: .6rem; }
+    .og-preview-img { width: 100%; border-radius: 8px; border: 1px solid var(--border); display: none; aspect-ratio: 1200/630; object-fit: cover; }
+    .og-preview-img.visible { display: block; }
+    .og-placeholder { width: 100%; aspect-ratio: 1200/630; background: var(--surface2); border-radius: 8px; border: 1px dashed var(--border); display: flex; align-items: center; justify-content: center; font-size: .7rem; font-family: var(--mono); color: var(--muted); }
+/* ── Cover actions ───────────────────────────────────────────── */
+.cover-actions{
+  display:flex;
+  gap:.5rem;
+  justify-content:center;
+  margin-top:.9rem;
+  display:none;
+}
+.cover-actions.visible{ display:flex; }
+.cover-actions button{
+  padding:.55rem .9rem;
+  background: var(--surface2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-family: var(--mono);
+  font-size: .75rem;
+  cursor: pointer;
+  transition: background .2s, border-color .2s, opacity .2s;
+}
+.cover-actions button:hover{ background: var(--surface); border-color: rgba(255,255,255,0.15); }
+.cover-actions button.danger{ color: #ff6b6b; border-color: rgba(255,107,107,0.25); }
+.cover-actions button.danger:hover{ border-color: rgba(255,107,107,0.45); }
+
+/* ── URL validation indicator ───────────────────────────────── */
+.url-status{
+  width: 10px; height: 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.05);
+  display:inline-block;
+  margin-left:auto;
+  justify-self:end;
+  transition: transform .15s, opacity .15s, background .15s, border-color .15s;
+  opacity: .35;
+}
+.url-status.valid{
+  background: rgba(48,209,88,0.22);
+  border-color: rgba(48,209,88,0.55);
+  opacity: 1;
+}
+.url-status.invalid{
+  background: rgba(255,59,48,0.20);
+  border-color: rgba(255,59,48,0.55);
+  opacity: 1;
+}
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      .app { grid-template-columns: 1fr; }
+      .panel-preview { display: none; }
+    }
+      /* ── Mobile tweaks ── */
+    .page{padding-bottom:calc(4rem + env(safe-area-inset-bottom));padding-top:calc(2rem + env(safe-area-inset-top));}
+
+    @media (max-width: 420px){
+      .page{padding:1.25rem .85rem calc(3rem + env(safe-area-inset-bottom));}
+      .card{flex:0 0 auto;width:min(400px, calc(100vw - 2rem));max-width: 400px;background:var(--card-bg);backdrop-filter:blur(28px) saturate(160%);border:1px solid rgba(255,255,255,0.09);border-radius:20px;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,.7);animation:fadeUp .65s cubic-bezier(.22,1,.36,1) both;}
+      .link-row{padding:.8rem 1.1rem;gap:.75rem;}
+      .link-name{font-size:.92rem;}
+      .link-action{font-size:.75rem;}
+      .cover-meta{bottom:1.05rem;}
+      .cover-meta .artist{font-size:1.65rem;}
+      .cover-meta .track{font-size:.76rem;letter-spacing:.12em;}
+      .socials{gap:.85rem;padding:1.05rem 1.1rem 1.15rem;}
+      .social-btn{width:36px;height:36px;}
+    }
+  
+    .copy-link-btn{
+  margin: 0 auto 1.5rem;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:.5rem;
+  padding:.55rem 1.2rem;
+  background:rgba(255,255,255,0.07);
+  border:1px solid rgba(255,255,255,0.10);
+  border-radius:999px;
+  color:rgba(255,255,255,0.55);
+  font-size:.75rem;
+  letter-spacing:.06em;
+  cursor:pointer;
+  transition:background .2s,color .2s,border-color .2s;
+  text-transform:uppercase;
+  font-family:'Inter',sans-serif;
+}
+.copy-link-btn:hover{background:rgba(255,255,255,0.12);color:#fff;border-color:rgba(255,255,255,0.2);}
+.copy-link-btn.copied{background:rgba(48,209,88,0.15);color:#30d158;border-color:rgba(48,209,88,0.3);}
+.copy-link-btn svg{width:14px;height:14px;flex-shrink:0;}
+.legal-footer{
+      position:fixed;
+      bottom:calc(14px + env(safe-area-inset-bottom));
+      left:50%;
+      transform:translateX(-50%);
+      font-size:11px;
+      color:rgba(255,255,255,0.45);
+      text-align:center;
+      z-index:20;
+    }
+    .legal-footer a{
+      color:rgba(255,255,255,0.55);
+      text-decoration:none;
+    }
+    .legal-footer a:hover{
+      color:rgba(255,255,255,0.9);
+      text-decoration:underline;
+    }
+
+  
+.cover-zone.dragover{border-color:var(--accent);background:rgba(255,107,26,0.05);}
+
+    /* ── Autofill Odesli ── */
+    .autofill-wrap {
+      display: flex;
+      gap: .5rem;
+      align-items: center;
+    }
+    .autofill-wrap input {
+      flex: 1;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: .82rem;
+      padding: .65rem .9rem;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .autofill-wrap input:focus { border-color: var(--accent); }
+    .autofill-wrap input::placeholder { color: var(--muted); }
+    .btn-autofill {
+      flex-shrink: 0;
+      padding: .65rem 1rem;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-family: var(--mono);
+      font-size: .78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s, opacity .2s;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+    }
+    .btn-autofill:hover { background: #ff8040; }
+    .btn-autofill:disabled { opacity: .5; cursor: not-allowed; }
+    .autofill-status {
+      margin-top: .5rem;
+      font-size: .72rem;
+      font-family: var(--mono);
+      color: var(--muted);
+      min-height: 1rem;
+      transition: color .2s;
+    }
+    .autofill-status.ok { color: var(--success); }
+    .autofill-status.err { color: #ff6b6b; }
+    .spinner {
+      width: 12px; height: 12px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin .6s linear infinite;
+      display: inline-block;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ════════════════════════════════════════════════════
+       LEFT — FORM
+  ════════════════════════════════════════════════════ -->
+  <div class="panel-form">
+    <div class="logo">VIQ Music · Release Tool</div>
+    <h1>Nouvelle<br/><span>landing page</span></h1>
+    <p class="subtitle">Remplis le formulaire → télécharge le dossier</p>
+
+    <!-- Infos générales -->
+    <div class="section">
+      <div class="section-title">Infos de la chanson</div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Artiste</label>
+          <input type="text" id="artist" value="VIQ" placeholder="VIQ"/>
+        </div>
+        <div class="field">
+          <label>Type</label>
+          <select id="type">
+            <option value="Single">Single</option>
+            <option value="EP">EP</option>
+            <option value="Album">Album</option>
+            <option value="Mixtape">Mixtape</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Titre de la chanson</label>
+        <input type="text" id="title" placeholder="titre" oninput="updateSlug()"/>
+      </div>
+
+      <div class="field">
+        <label>Slug URL (nom du dossier)</label>
+        <input type="text" id="slug" placeholder="slug" style="font-family:var(--mono);"/>
+      </div>
+    </div>
+
+    <!-- Cover -->
+    <div class="section">
+      <div class="section-title">Pochette</div>
+      <div class="cover-upload" id="coverZone">
+        <input type="file" id="coverInput" accept="image/*" onchange="handleCover(event)"/>
+        <img class="preview" id="coverPreview" alt="cover"/>
+        <div class="icon">🎨</div>
+        <div class="hint">Glisse ta pochette ici<br/>JPG · 1000×1000px recommandé</div>
+      </div>
+
+<div class="cover-actions" id="coverActions">
+  <button type="button" onclick="triggerCoverChange()">Change</button>
+  <button type="button" class="danger" onclick="removeCover()">Remove</button>
+</div>
+    </div>
+      <div id="coverOptStatus" style="margin-top:.65rem;font-size:.72rem;font-family:var(--mono);color:var(--muted);text-align:center;display:none;"></div>
+
+
+    <!-- Auto-remplissage Odesli -->
+    <div class="section">
+      <div class="section-title">Auto-remplissage des liens</div>
+      <div class="autofill-wrap">
+        <input type="url" id="autofillInput" placeholder="Colle un lien Spotify, Apple Music, YouTube…"/>
+        <button class="btn-autofill" id="btnAutofill" onclick="autofillLinks()">
+          <span id="autofillBtnContent">⚡ Remplir</span>
+        </button>
+      </div>
+      <div class="autofill-status" id="autofillStatus"></div>
+    </div>
+
+    <!-- Plateformes -->
+    <div class="section">
+      <div class="section-title">Liens plateformes</div>
+      <div class="platform-list" id="platformList"></div>
+    </div>
+
+<!-- Socials -->
+<div class="section">
+  <div class="section-title">Réseaux sociaux</div>
+  <div class="social-list">
+    <div class="social-row">
+      <span class="social-label">Instagram</span>
+      <input 
+        type="url" 
+        id="s-instagram" 
+        placeholder="https://instagram.com/viqmusic"
+        value="https://www.instagram.com/viqmusic/"
+      />
+    </div>
+
+    <div class="social-row">
+      <span class="social-label">TikTok</span>
+      <input 
+        type="url" 
+        id="s-tiktok" 
+        placeholder="https://tiktok.com/@viqmusic"
+        value="https://www.tiktok.com/@viqmusic"
+      />
+    </div>
+
+    <div class="social-row">
+      <span class="social-label">Facebook</span>
+      <input 
+        type="url" 
+        id="s-facebook" 
+        placeholder="https://facebook.com/viqmusic"
+        value="https://www.facebook.com/Viqmusic"
+      />
+    </div>
+
+    <div class="social-row">
+      <span class="social-label">Site web</span>
+      <input 
+        type="url" 
+        id="s-website" 
+        placeholder="https://www.viqmusic.net" 
+        value="https://www.viqmusic.net"
+      />
+    </div>
+  </div>
+</div>
+
+    <button class="btn-generate" onclick="generate()">⚡ Générer la landing page</button>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════
+       RIGHT — PREVIEW
+  ════════════════════════════════════════════════════ -->
+  <div class="panel-preview">
+    <div class="preview-header">
+      <span>Aperçu live</span>
+      <button class="btn-download" id="btnDownload" onclick="downloadZip()">↓ Télécharger le dossier</button>
+    </div>
+    <div class="preview-frame-wrap">
+      <div id="previewEmpty" class="preview-empty">
+        <span class="big">📱</span>
+        L'aperçu apparaît<br/>après génération
+      </div>
+      <div class="phone-mockup" id="phoneMockup" style="display:none;">
+        <div class="phone-notch"></div>
+        <iframe id="previewFrame" title="Preview"></iframe>
+      </div>
+    </div>
+    <!-- OG image preview -->
+    <div class="og-preview-wrap">
+      <div class="og-preview-label">Aperçu OG (Discord / Facebook)</div>
+      <div class="og-placeholder" id="ogPlaceholder">Générer la page pour voir l'OG</div>
+      <img id="ogPreviewImg" class="og-preview-img" alt="OG preview"/>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+     MODAL DE SUCCÈS
+════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h2>Page <span>générée !</span> 🎉</h2>
+    <p id="modalMsg">Télécharge le dossier, puis uploade-le tel quel dans ton repo GitHub <strong>releases</strong>.<br/><br/>Ta page sera live sur :<br/><code id="modalUrl" style="color:#ff6b1a;"></code></p>
+    <div class="modal-actions">
+      <button class="btn-modal primary" onclick="downloadZip()">↓ Télécharger le dossier</button>
+      <button class="btn-modal secondary" onclick="duplicateConfig(); closeModal()">⧉ Dupliquer</button>
+      <button class="btn-modal secondary" onclick="closeModal()">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<!-- JSZip pour créer le zip côté navigateur -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+<script>
+// ── Plateformes disponibles ───────────────────────────────────────────────────
+const PLATFORMS = [
+  { id: 'store',        label: 'Store',         action: 'Shop',   color: '#f5c518', bg: '#1a1500', isStore: true },
+  { id: 'spotify',      label: 'Spotify',       action: 'Listen', color: '#1DB954', bg: '#0d1f13' },
+  { id: 'apple',        label: 'Apple Music',   action: 'Listen', color: '#FC3C44', bg: '#1f0a0b' },
+  { id: 'youtube',      label: 'YouTube',       action: 'Watch',  color: '#FF0000', bg: '#1f0000' },
+  { id: 'youtubemusic', label: 'YouTube Music', action: 'Listen', color: '#FF0000', bg: '#1f0000' },
+  { id: 'deezer',       label: 'Deezer',        action: 'Listen', color: '#A238FF', bg: '#120020' },
+  { id: 'soundcloud',   label: 'SoundCloud',    action: 'Listen', color: '#FF5500', bg: '#1f0d00' },
+  { id: 'amazon',       label: 'Amazon Music',  action: 'Listen',   color: '#00A8E1', bg: '#001b24' },
+  { id: 'tidal',        label: 'Tidal',         action: 'Listen', color: '#ffffff', bg: '#111111' },
+  { id: 'bandcamp',     label: 'Bandcamp',      action: 'Buy',    color: '#1da0c3', bg: '#001a22' },
+  { id: 'pandora',      label: 'Pandora',       action: 'Listen', color: '#3668FF', bg: '#05102e' },
+  { id: 'anghami',      label: 'Anghami',       action: 'Listen', color: '#7c4dff', bg: '#100a1f' },
+];
+
+// Slugs Simple Icons
+const SI = {
+  spotify:'spotify', apple:'applemusic', youtube:'youtube',
+  youtubemusic:'youtubemusic', deezer:'deezer', soundcloud:'soundcloud',
+  amazon: null, tidal:'tidal', bandcamp:'bandcamp',
+  anghami: null, pandora:'pandora',
+  store: null,
+  instagram:'instagram', facebook:'facebook', tiktok:'tiktok',
+};
+
+const INLINE_ICONS = {
+  store:   '<svg viewBox="0 0 24 24" fill="none" width="22" height="22" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>',
+
+  amazon: `
+  <svg viewBox="0 0 24 24" fill="white" width="22" height="22" xmlns="http://www.w3.org/2000/svg">
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M11.08 15.54c-1.06 0-1.68-.81-1.68-2 0-2.37 2.11-2.8 4.12-2.8 0 1.74-.05 4.8-2.44 4.8Zm5.23 2.56a.57.57 0 0 1-.66.06c-.92-.76-1.08-1.12-1.59-1.85-2.54 3.22-8.7 2.84-8.7-2.3 0-4.61 4.65-5.5 8.15-5.48 0 0 .13-1.7-.33-2.37-.97-1.46-3.46-.6-3.78.94-.05.25-.23.5-.48.51l-2.69-.3c-.22-.04-.48-.22-.41-.57.62-3.26 3.56-4.24 6.2-4.24 1.34 0 3.06.4 4.16 1.38 1.85 1.62 1.06 6.86 1.22 9.08 0 1.3.54 1.87 1.05 2.57.18.25.21.55-.01.73L16.3 18.1Zm3.12 1.74A16.09 16.09 0 0 1 2.3 18.5c-.25-.18-.42.14-.22.37 4.42 5.16 12.44 6.44 17.65 1.6.36-.33.05-.83-.31-.63Zm.58 1.94c-.08.2.1.28.28.13 1.17-.98 1.47-3.04 1.23-3.34-.24-.29-2.29-.54-3.54.34-.2.13-.16.32.06.3.7-.1 2.27-.28 2.55.08.28.36-.31 1.83-.58 2.49Z"/>
+  </svg>`,
+
+  anghami: `
+  <svg viewBox="0 0 24 24" fill="white" width="22" height="22" xmlns="http://www.w3.org/2000/svg">
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M2.127 13.66c.678 4.178 4.192 7.648 8.392 8.232a10.456 10.456 0 0 0 5.702-.817c.301-.137.533-.264.514-.282l-1.984-.388c-1.36.32-2.704.537-4.103.303C5.672 19.876 2.1 14.815 3.424 9.85c.518-1.942 1.681-3.712 3.288-4.922 1.703-1.283 3.956-1.964 6.089-1.727 4.14.46 7.506 3.788 7.978 7.907.045.385.081 5.243.081 5.243l.001 4.542 1.103.181.028-5.25c-.028-4.642-.049-5.323-.177-5.869-1.034-4.428-4.97-7.814-9.52-7.95C6.082 1.822 1.133 7.53 2.127 13.66ZM4.42 8.877c-1.624 4.02.21 8.67 4.099 10.504 1.981.936 4.093.93 6.165.354V18.44c-1.915.74-3.97.706-5.807-.2-1.777-.879-3.173-2.571-3.66-4.503a7.123 7.123 0 0 1 1.44-6.285c1.282-1.549 3.351-2.44 5.34-2.438 3.211.002 6.024 2.301 6.817 5.368.169.653.179.907.213 5.432l.037 4.748 1.138.204v-4.52s-.035-4.806-.09-5.261c-.474-3.883-3.886-6.993-7.801-7.158-3.37-.142-6.618 1.899-7.891 5.05Zm2.707-.98c-2.776 3.349-1.336 8.668 2.756 10.092 1.598.555 3.259.433 4.8-.211 0 0-.057-1.3-.061-1.299-1.282.644-2.802.892-4.186.446-1.53-.492-2.81-1.713-3.323-3.243-.47-1.398-.33-2.867.348-4.18.888-1.717 2.94-2.754 4.824-2.657 2.13.11 3.928 1.55 4.636 3.522.191.531.193.573.234 5.185l.04 4.65 1.207.223-.032-4.679c-.03-4.508-.038-4.703-.211-5.33-.726-2.623-3.028-4.575-5.781-4.763-1.97-.134-3.988.72-5.25 2.243Zm.418 3.253c-.484 2.354 1.191 4.785 3.535 5.283 1.273.27 2.487-.13 3.604-.738v-1.637c-.91.822-1.905 1.435-3.196 1.234-1.801-.28-3.03-2.019-2.802-3.79.215-1.66 1.709-2.827 3.317-2.82 1.656.007 2.646 1.089 3.299 2.468l.082 8.726 1.112.213-.133-9.316c-.569-1.916-2.325-3.292-4.356-3.28a4.55 4.55 0 0 0-4.462 3.657Z"/>
+  </svg>`
+};
+
+// State
+let coverFile = null;
+let coverDataURL = null; // ✅ for live preview
+
+let previewTimer = null;
+function schedulePreview(){
+  clearTimeout(previewTimer);
+  previewTimer = setTimeout(updatePreviewLive, 120);
+}
+
+// ── Phone preview scaling (auto center + auto scale) ───────────────────────────
+function updatePhoneScale(){
+  const mock = document.getElementById('phoneMockup');
+  const frame = document.getElementById('previewFrame');
+  if (!mock || !frame) return;
+
+  // Match the "real" iPhone viewport size used by the iframe content
+  const realW = 390;
+  const realH = 780;
+
+  const w = mock.clientWidth;
+  const h = mock.clientHeight;
+
+  const scale = Math.min(w / realW, h / realH);
+  mock.style.setProperty('--phone-scale', String(scale));
+}
+
+window.addEventListener('resize', updatePhoneScale);
+
+let generatedHTML = '';
+let generatedSlug = '';
+
+// ── Init platform list ────────────────────────────────────────────────────────
+function initPlatforms() {
+  const list = document.getElementById('platformList');
+  PLATFORMS.forEach(p => {
+    const row = document.createElement('div');
+    row.className = 'platform-row';
+    const placeholder = p.id === 'store' ? 'https://ton-site-merch.com' : 'https://...';
+
+row.innerHTML = `
+  <button class="platform-toggle active" data-id="${p.id}" onclick="togglePlatform('${p.id}', this)" title="Activer/désactiver">✓</button>
+  <span class="platform-name">${p.label}</span>
+  <input type="url" id="link-${p.id}" placeholder="${placeholder}" oninput="schedulePreview()"/>
+  <div class="url-status" id="status-${p.id}"></div>
+`;
+
+    list.appendChild(row);
+
+    const input = row.querySelector(`#link-${p.id}`);
+
+    // ✅ Tout actif par défaut
+    input.style.opacity = '1';
+    input.style.pointerEvents = 'auto';
+
+    // ✅ Pré-remplir le Store (Fourthwall)
+    if (p.id === 'store') {
+      input.value = 'https://viq-shop.fourthwall.com/';
+    }
+  });
+}
+
+function isValidHttpUrl(value){
+  if (!value) return false;
+  try{
+    const u = new URL(value);
+    return u.protocol === 'http:' || u.protocol === 'https:';
+  }catch(_){
+    return false;
+  }
+}
+
+function setStatus(el, state){
+  if (!el) return;
+  el.classList.remove('valid','invalid');
+  if (state === 'valid') el.classList.add('valid');
+  if (state === 'invalid') el.classList.add('invalid');
+}
+
+function wireUrlValidation(){
+  // Platform inputs
+  PLATFORMS.forEach(p => {
+    const input = document.getElementById(`link-${p.id}`);
+    const dot = document.getElementById(`status-${p.id}`);
+    if (!input || !dot) return;
+
+input.addEventListener('blur', (e) => {
+  let val = e.target.value.trim();
+  if (!val) return;
+
+  // 1. Ajoute https:// si manquant
+  if (!/^https?:\/\//i.test(val)) val = 'https://' + val;
+
+  try {
+    const url = new URL(val);
+    // 2. Nettoyage des paramètres inutiles (utm, etc)
+    const paramsToClean = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'si'];
+    paramsToClean.forEach(p => url.searchParams.delete(p));
+    
+    e.target.value = url.toString();
+  } catch(err) { /* URL invalide, on laisse la validation normale gérer */ }
+});
+
+    const refresh = () => {
+      const v = (input.value || '').trim();
+      if (!v){ setStatus(dot, null); return; }
+      setStatus(dot, isValidHttpUrl(v) ? 'valid' : 'invalid');
+    };
+
+    input.addEventListener('input', refresh);
+    input.addEventListener('change', refresh);
+    refresh();
+  });
+}
+
+function togglePlatform(id, btn) {
+  const input = document.getElementById(`link-${id}`);
+  const isActive = btn.classList.toggle('active');
+  // Ne pas désactiver l'input pour garder la valeur accessible
+  input.style.opacity = isActive ? '1' : '0.3';
+  input.style.pointerEvents = isActive ? 'auto' : 'none';
+  btn.textContent = isActive ? '✓' : '+';
+  schedulePreview();
+}
+
+// ── Slug auto ─────────────────────────────────────────────────────────────────
+function updateSlug() {
+  const title = document.getElementById('title').value;
+  const slug = title
+    .toLowerCase()
+    .normalize("NFD") // Sépare les accents des lettres
+    .replace(/[\u0300-\u036f]/g, "") // Supprime les accents
+    .replace(/[^a-z0-9]/g, '-') // Remplace tout ce qui n'est pas alphanumérique par -
+    .replace(/-+/g, '-') // Évite les doubles tirets --
+    .replace(/^-|-$/g, ''); // Nettoie le début et la fin
+  document.getElementById('slug').value = slug;
+}
+
+// ── Cover ─────────────────────────────────────────────────────────────────────
+async function handleCover(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const statusEl = document.getElementById('coverOptStatus');
+  if (statusEl){
+    statusEl.style.display = 'block';
+    statusEl.textContent = 'Optimizing cover…';
+  }
+
+  try{
+    const result = await processCover(file);
+
+    coverFile = result.optimizedFile;
+    coverDataURL = result.optimizedDataURL;
+
+    const preview = document.getElementById('coverPreview');
+    preview.src = coverDataURL;
+    document.getElementById('coverZone').classList.add('has-file');
+
+    const actions = document.getElementById('coverActions');
+    if (actions) actions.classList.add('visible');
+
+    if (statusEl){
+      statusEl.textContent = `Optimized: ${formatBytes(result.originalBytes)} → ${formatBytes(result.optimizedBytes)}`;
+    }
+
+    schedulePreview();
+  }catch(err){
+    console.error(err);
+    // Fallback to original (no optimization)
+    coverFile = file;
+    coverDataURL = await fileToDataURL(file);
+
+    const preview = document.getElementById('coverPreview');
+    preview.src = coverDataURL;
+    document.getElementById('coverZone').classList.add('has-file');
+
+    const actions = document.getElementById('coverActions');
+    if (actions) actions.classList.add('visible');
+
+    if (statusEl){
+      statusEl.textContent = 'Optimization failed — using original image.';
+    }
+
+    schedulePreview();
+  }
+}
+
+
+function triggerCoverChange(){
+  const input = document.getElementById('coverInput');
+  if (input) input.click();
+}
+
+function removeCover(){
+  coverFile = null;
+  coverDataURL = null;
+  const input = document.getElementById('coverInput');
+  const preview = document.getElementById('coverPreview');
+  const zone = document.getElementById('coverZone');
+  const actions = document.getElementById('coverActions');
+
+  if (input) input.value = '';
+  if (preview) preview.src = '';
+  if (zone) zone.classList.remove('has-file');
+  if (actions) actions.classList.remove('visible');
+
+  const status = document.getElementById('coverOptStatus');
+  if (status){ status.style.display = 'none'; status.textContent = ''; }
+
+  schedulePreview();
+}
+
+function wireCoverDrop(){
+  const zone = document.getElementById('coverZone');
+  const input = document.getElementById('coverInput');
+  if (!zone || !input) return;
+
+  zone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    zone.classList.add('dragover');
+  });
+
+  zone.addEventListener('dragleave', () => {
+    zone.classList.remove('dragover');
+  });
+
+  zone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    zone.classList.remove('dragover');
+    const file = e.dataTransfer && e.dataTransfer.files ? e.dataTransfer.files[0] : null;
+    if (!file) return;
+
+    // Try to set input.files (best effort)
+    try {
+      const dt = new DataTransfer();
+      dt.items.add(file);
+      input.files = dt.files;
+    } catch(_) {}
+
+    handleCover({ target: { files: [file] } });
+  });
+}
+
+
+// ── Dominant color extraction (canvas) ───────────────────────────────────────
+function extractColor(imgSrc) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = canvas.height = 80;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, 80, 80);
+
+      const data = ctx.getImageData(0, 0, 80, 80).data;
+      const buckets = {};
+
+      // Seuils “pro”
+      const MIN_V = 30 / 255;      // ignore trop sombre
+      const MAX_V = 245 / 255;     // ignore quasi blanc
+      const MIN_S = 0.12;          // si saturation trop faible, on fera fallback
+      const Q = 24;                // quantization step (comme toi)
+
+      let kept = 0;                // pixels gardés
+      let satSum = 0;              // pour estimer saturation moyenne
+      let best = null;
+      let bestScore = 0;
+
+      function rgbToHsv(r, g, b) {
+        const max = Math.max(r, g, b);
+        const min = Math.min(r, g, b);
+        const d = max - min;
+        const v = max;
+        const s = max === 0 ? 0 : d / max;
+        return { s, v };
+      }
+
+      for (let i = 0; i < data.length; i += 4) {
+        const a = data[i + 3] / 255;
+        if (a < 0.6) continue; // ignore pixels transparents / semi transparents
+
+        const r0 = data[i] / 255;
+        const g0 = data[i + 1] / 255;
+        const b0 = data[i + 2] / 255;
+
+        const { s, v } = rgbToHsv(r0, g0, b0);
+
+        // 1) ignore trop sombre
+        if (v < MIN_V) continue;
+
+        // 2) ignore quasi blanc
+        // (v très haut + saturation faible = blanc/gris clair)
+        if (v > MAX_V && s < 0.10) continue;
+
+        // quantize en buckets
+        const r = Math.round((r0 * 255) / Q) * Q;
+        const g = Math.round((g0 * 255) / Q) * Q;
+        const b = Math.round((b0 * 255) / Q) * Q;
+
+        const key = `${r},${g},${b}`;
+        buckets[key] = (buckets[key] || 0) + 1;
+
+        kept++;
+        satSum += s;
+      }
+
+      // Si on n’a rien gardé (cover très dark / très blanche)
+      if (kept === 0) {
+        resolve('#ff6b1a');
+        return;
+      }
+
+      // 3) fallback si saturation trop faible
+      const avgS = satSum / kept;
+      const saturationTooLow = avgS < MIN_S;
+
+      // Score par bucket : fréquence * boost saturation * boost luminosité
+      // On recalc s & v sur la couleur bucket pour scorer proprement.
+      for (const [key, count] of Object.entries(buckets)) {
+        const [rr, gg, bb] = key.split(',').map(Number);
+        const r = rr / 255, g = gg / 255, b = bb / 255;
+        const { s, v } = rgbToHsv(r, g, b);
+
+        // si la cover est globalement terne, on évite d’amplifier la saturation
+        const sWeight = saturationTooLow ? 0.35 : 1.5;
+
+        const score =
+          count *
+          Math.pow(s, sWeight) *
+          Math.pow(v, 0.9);
+
+        if (score > bestScore) {
+          bestScore = score;
+          best = [rr, gg, bb];
+        }
+      }
+
+      if (!best) {
+        resolve('#ff6b1a');
+        return;
+      }
+
+      // Si saturation trop faible, fallback vers ton accent, MAIS teinté légèrement
+      // (ça garde une vibe cover sans devenir gris triste)
+      if (saturationTooLow) {
+        // mix 70% accent + 30% best (simple blend)
+        const accent = [255, 107, 26]; // #ff6b1a
+        const mix = (a, b) => Math.round(a * 0.7 + b * 0.3);
+        const out = [mix(accent[0], best[0]), mix(accent[1], best[1]), mix(accent[2], best[2])];
+        const hex = '#' + out.map(x => x.toString(16).padStart(2, '0')).join('');
+        resolve(hex);
+        return;
+      }
+
+      const hex = '#' + best.map(x => x.toString(16).padStart(2, '0')).join('');
+      resolve(hex);
+    };
+
+    img.onerror = () => resolve('#ff6b1a');
+    img.src = imgSrc;
+  });
+}
+
+function shiftHue(hex, deg) {
+  let r = parseInt(hex.slice(1,3),16)/255;
+  let g = parseInt(hex.slice(3,5),16)/255;
+  let b = parseInt(hex.slice(5,7),16)/255;
+  const max=Math.max(r,g,b), min=Math.min(r,g,b), d=max-min;
+  let h=0, s= max===0?0:d/max, v=max;
+  if(d){
+    if(max===r) h=((g-b)/d)%6;
+    else if(max===g) h=(b-r)/d+2;
+    else h=(r-g)/d+4;
+    h=((h*60+deg)%360+360)%360;
+  }
+  const c=v*s, x=c*(1-Math.abs((h/60)%2-1)), m=v-c;
+  let nr,ng,nb;
+  if(h<60){nr=c;ng=x;nb=0;}else if(h<120){nr=x;ng=c;nb=0;}
+  else if(h<180){nr=0;ng=c;nb=x;}else if(h<240){nr=0;ng=x;nb=c;}
+  else if(h<300){nr=x;ng=0;nb=c;}else{nr=c;ng=0;nb=x;}
+  return '#'+[nr+m,ng+m,nb+m].map(v=>Math.round(v*255).toString(16).padStart(2,'0')).join('');
+}
+
+function darken(hex, f=0.10) {
+  const r=parseInt(hex.slice(1,3),16);
+  const g=parseInt(hex.slice(3,5),16);
+  const b=parseInt(hex.slice(5,7),16);
+  return `rgb(${Math.round(r*f)},${Math.round(g*f)},${Math.round(b*f)})`;
+}
+
+// ── Build HTML ────────────────────────────────────────────────────────────────
+function buildHTML(artist, title, type, coverSrc, primary, orb2, darkBg, links, socials, slug) {
+  const globeSvg = `<svg viewBox="0 0 24 24" fill="white" width="18" height="18"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>`;
+
+  const linksHTML = links.map(({platform, label, action, color, bg}, i) => {
+    const siSlug = SI[platform.id];
+    const iconHTML = INLINE_ICONS[platform.id]
+      ? INLINE_ICONS[platform.id]
+      : `<img src="https://cdn.simpleicons.org/${siSlug}/ffffff" width="22" height="22" alt="${label}"/>`;
+    const delay = (0.15 + i * 0.07).toFixed(2);
+    return `
+    <a href="${platform.url}" target="_blank" rel="noopener" class="link-row" style="--accent:${color};--bg:${bg};animation-delay:${delay}s;">
+      <span class="link-icon">${iconHTML}</span>
+      <span class="link-name">${label}</span>
+      <span class="link-action">${action}<svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+    </a>`;
+  }).join('');
+
+  const socialsHTML = Object.entries(socials).filter(([,v])=>v).map(([key, url]) => `
+    <a href="${url}" target="_blank" class="social-btn" title="${key}">
+      ${key === 'website' ? globeSvg : `<img src="https://cdn.simpleicons.org/${SI[key]||key}/ffffff" width="18" height="18" alt="${key}"/>`}
+    </a>`).join('');
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>${artist} – ${title}</title>
+  <meta name="description" content="Listen to ${title} by ${artist} on Spotify, Apple Music, YouTube and more. Stream now."/>
+  <meta property="og:title" content="${artist} – ${title}"/>
+  <meta property="og:description" content="Listen to ${title} by ${artist} on Spotify, Apple Music, YouTube and more. Stream now."/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://go.viqmusic.net/${slug}/"/>
+     <meta property="og:image" content="https://go.viqmusic.net/${slug}/og.jpg"/>
+     <meta property="og:image:type" content="image/jpeg"/>
+     <meta property="og:image:width" content="1200"/>
+     <meta property="og:image:height" content="630"/>
+    <link rel="canonical" href="https://go.viqmusic.net/${slug}/"/>
+     <meta name="twitter:url" content="https://go.viqmusic.net/${slug}/"/>
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="${artist} – ${title}"/>
+  <meta name="twitter:description" content="Listen to ${title} by ${artist} on Spotify, Apple Music, YouTube and more. Stream now."/>
+  <meta name="twitter:image" content="https://go.viqmusic.net/${slug}/og.jpg"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/jpeg" href="cover.jpg"/>
+  <link rel="apple-touch-icon" href="cover.jpg"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    :root{--primary:${primary};--card-bg: rgba(0,0,0,0.92);--text:#f5f0eb;--muted: rgba(245,240,235,0.75);}
+    html,body{min-height:100%;font-family:'Inter',sans-serif;background:#000;color:var(--text);overflow-x:hidden;}
+    .bg-cover{position:fixed;inset:0;z-index:0;overflow:hidden;}
+    .bg-cover img{width:110%;height:110%;object-fit:cover;position:absolute;top:-5%;left:-5%;
+      filter:blur(80px) saturate(130%) brightness(0.85);
+      transform:scale(1.2);}
+    .bg-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.75);}
+    .page{position:relative;z-index:1;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:2rem 1rem 7rem;}
+    .card{width:100%;max-width: 400px;background:var(--card-bg);backdrop-filter:blur(28px) saturate(160%);border:1px solid rgba(255,255,255,0.09);border-radius:20px;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,.7);animation:fadeUp .65s cubic-bezier(.22,1,.36,1) both;}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(32px);}to{opacity:1;transform:translateY(0);}}
+    .cover-wrap{position:relative;aspect-ratio:1/1;overflow:hidden;}
+    .cover-wrap img.cover{width:100%;height:100%;object-fit:cover;display:block;transition:transform .7s ease;}
+    .cover-wrap:hover img.cover{transform:scale(1.05);}
+    .cover-gradient{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 45%,rgba(0,0,0,0.30) 100%);}
+    .cover-meta{position:absolute;bottom:1.25rem;left:0;right:0;text-align:center;}
+    .cover-meta .artist{
+      font-family:'Playfair Display', serif;
+      font-weight:700;
+      font-size:1.8rem;
+      letter-spacing:0.02em;
+    }
+    .cover-meta .track{font-size:.82rem;color:var(--muted);letter-spacing:.14em;text-transform:uppercase;margin-top:.15rem;}
+    .links-list{padding:.5rem 0 1rem;display:flex;flex-direction:column;}
+    .link-row{opacity:0;animation:linkIn .4s cubic-bezier(.22,1,.36,1) forwards;}
+    @keyframes linkIn{from{opacity:0;transform:translateX(-12px);}to{opacity:1;transform:translateX(0);}}
+    .link-row{display:flex;align-items:center;gap:.9rem;padding:.85rem 1.5rem;text-decoration:none;color:var(--text);border-left:3px solid transparent;transition:border-color .2s;position:relative;z-index:0;}
+    .link-row::after{content:'';position:absolute;inset:0;background:var(--bg,#111);opacity:0;transition:opacity .2s;z-index:-1;}
+    .link-row:hover::after{opacity:1;}
+    .link-row:hover{border-left-color:var(--accent);}
+    .link-row{display:flex;align-items:center;gap:.9rem;padding:.85rem 1.5rem;text-decoration:none;color:var(--text);border-left:3px solid transparent;transition:border-color .2s;position:relative;z-index:0;}
+    .link-row::after{content:'';position:absolute;inset:0;background:var(--bg,#111);opacity:0;transition:opacity .2s;z-index:-1;}
+    .link-row:hover::after{opacity:1;}
+    .link-row:hover{border-left-color:var(--accent);}
+    .link-icon{width:22px;height:22px;flex-shrink:0;display:flex;align-items:center;}
+    .link-icon img{display:block;opacity:.7;transition:opacity .2s;}
+    .link-icon svg{display:block;opacity:.7;transition:opacity .2s;}
+    .link-row:hover .link-icon img{opacity:1;}
+    .link-row:hover .link-icon svg{opacity:1;}
+    .link-name{flex:1;font-size:.95rem;}
+    .link-action{font-size:.78rem;color:var(--muted);letter-spacing:.06em;display:flex;align-items:center;gap:.3rem;transition:color .2s;}
+    .link-row:hover .link-action{color:var(--accent);}
+    .arrow{width:14px;height:14px;}
+    .divider{height:1px;background:rgba(255,255,255,0.06);margin:0 1.5rem .5rem;}
+    .link-row.store-row{border-bottom:1px solid rgba(255,255,255,0.08);margin-bottom:.25rem;}
+    .socials{display:flex;justify-content:center;gap:1rem;padding:1.25rem 1.5rem 1.5rem;border-top:1px solid rgba(255,255,255,0.06);}
+    .social-btn{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.07);display:grid;place-items:center;text-decoration:none;transition:background .2s,transform .2s;}
+    .social-btn img,.social-btn svg{opacity:.5;transition:opacity .2s;display:block;}
+    .social-btn:hover{background:var(--primary);transform:translateY(-2px);}
+    .social-btn:hover img,.social-btn:hover svg{opacity:1;}
+      /* ── Mobile tweaks ── */
+    .page{padding-bottom:calc(4rem + env(safe-area-inset-bottom));padding-top:calc(2rem + env(safe-area-inset-top));}
+
+    @media (max-width: 420px){
+      .page{padding:1.25rem .85rem calc(3rem + env(safe-area-inset-bottom));}
+      .card{border-radius:18px;}
+      .link-row{padding:.8rem 1.1rem;gap:.75rem;}
+      .link-name{font-size:.92rem;}
+      .link-action{font-size:.75rem;}
+      .cover-meta{bottom:1.05rem;}
+      .cover-meta .artist{font-size:1.65rem;}
+      .cover-meta .track{font-size:.76rem;letter-spacing:.12em;}
+      .socials{gap:.85rem;padding:1.05rem 1.1rem 1.15rem;}
+      .social-btn{width:36px;height:36px;}
+    }
+  
+    .copy-link-btn{
+  margin: 0 auto 1.5rem;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:.5rem;
+  padding:.55rem 1.2rem;
+  background:rgba(255,255,255,0.07);
+  border:1px solid rgba(255,255,255,0.10);
+  border-radius:999px;
+  color:rgba(255,255,255,0.55);
+  font-size:.75rem;
+  letter-spacing:.06em;
+  cursor:pointer;
+  transition:background .2s,color .2s,border-color .2s;
+  text-transform:uppercase;
+  font-family:'Inter',sans-serif;
+}
+.copy-link-btn:hover{background:rgba(255,255,255,0.12);color:#fff;border-color:rgba(255,255,255,0.2);}
+.copy-link-btn.copied{background:rgba(48,209,88,0.15);color:#30d158;border-color:rgba(48,209,88,0.3);}
+.copy-link-btn svg{width:14px;height:14px;flex-shrink:0;}
+.legal-footer{
+      position:fixed;
+      bottom:calc(14px + env(safe-area-inset-bottom));
+      left:50%;
+      transform:translateX(-50%);
+      font-size:11px;
+      color:rgba(255,255,255,0.45);
+      text-align:center;
+      z-index:20;
+    }
+    .legal-footer a{
+      color:rgba(255,255,255,0.55);
+      text-decoration:none;
+    }
+    .legal-footer a:hover{
+      color:rgba(255,255,255,0.9);
+      text-decoration:underline;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="bg-cover"><img src="cover.jpg" alt=""><div class="bg-overlay"></div></div>
+  <div class="page">
+    <div class="card">
+      <div class="cover-wrap">
+        <img class="cover" src="cover.jpg" alt="${title} cover"/>
+        <div class="cover-gradient"></div>
+        <div class="cover-meta">
+          <div class="artist">${artist}</div>
+          <div class="track">${title} · ${type}</div>
+        </div>
+      </div>
+      <div class="links-list">
+        <div class="divider"></div>
+        ${linksHTML}
+      </div>
+      <div class="socials">${socialsHTML}</div>
+
+      <button class="copy-link-btn" id="copyLinkBtn" onclick="shareOrCopy(this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3"/></svg>
+    Share
+  </button>
+    </div>
+  </div>
+
+<div class="legal-footer">
+    <a href="/mentions.html">Legal Notice</a> · 
+    <a href="/privacy.html">Privacy Policy</a>
+  </div>
+
+<script>
+async function shareOrCopy(btn){
+  const shareData = {
+    title: document.title || 'Listen now',
+    text: 'Listen now',
+    url: window.location.href
+  };
+
+  // Try native share first (mobile) — partage le lien, pas l'image
+  if (navigator.share){
+    try{
+      await navigator.share(shareData);
+      return;
+    }catch(_){
+      // user cancelled or share failed -> fallback to copy
+    }
+  }
+
+  // Fallback: copy link (Clipboard API -> execCommand)
+  const original = btn.innerHTML;
+  const okLabel = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/><\/svg> Link copied!';
+  const failLabel = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 3v10"/><path d="M8 7l4-4 4 4"/><path d="M6 21h12"/><\/svg> Copy failed';
+
+  async function clipboardCopy(text){
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly','');
+    ta.style.position = 'fixed';
+    ta.style.top = '-1000px';
+    document.body.appendChild(ta);
+    ta.select();
+    try{
+      const ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+      return ok;
+    }catch(_){
+      document.body.removeChild(ta);
+      return false;
+    }
+  }
+
+  const ok = await clipboardCopy(window.location.href);
+  btn.classList.add('copied');
+  btn.innerHTML = ok ? okLabel : failLabel;
+
+  setTimeout(() => {
+    btn.classList.remove('copied');
+    btn.innerHTML = original;
+  }, 2000);
+}
+<\/script>
+</body>
+</html>`;
+}
+
+// ── Generate ──────────────────────────────────────────────────────────────────
+
+
+// ── Live preview ─────────────────────────────────────────────────────────────
+function wireLivePreview(){
+  const ids = ['artist','title','type','slug','s-instagram','s-tiktok','s-facebook','s-website'];
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('input', schedulePreview);
+    el.addEventListener('change', schedulePreview);
+  });
+
+  const plist = document.getElementById('platformList');
+  if (plist){
+    plist.addEventListener('input', schedulePreview);
+    plist.addEventListener('change', schedulePreview);
+  }
+}
+
+async function updatePreviewLive(){
+  const artist = (document.getElementById('artist').value || 'VIQ').trim();
+  const title  = (document.getElementById('title').value || 'Untitled').trim();
+  const type   = document.getElementById('type').value;
+
+  let coverSrc = coverDataURL;
+  if (!coverSrc && coverFile){
+    coverSrc = await fileToDataURL(coverFile);
+    coverDataURL = coverSrc;
+  }
+
+  let primary = '#ff6b1a';
+  if (coverSrc){
+    try { primary = await extractColor(coverSrc); } catch(_) {}
+  }
+  const orb2   = shiftHue(primary, -35);
+  const darkBg = darken(primary, 0.08);
+
+  const links = PLATFORMS
+    .filter(p => {
+      const btn = document.querySelector(`.platform-toggle[data-id="${p.id}"]`);
+      return btn && btn.classList.contains('active');
+    })
+    .map(p => {
+      const input = document.getElementById(`link-${p.id}`);
+      const url = (input ? input.value.trim() : '') || '#';
+      return { platform: { id: p.id, url }, label: p.label, action: p.action, color: p.color, bg: p.bg };
+    });
+
+  const socials = {
+    instagram: document.getElementById('s-instagram').value.trim(),
+    tiktok:    document.getElementById('s-tiktok').value.trim(),
+    facebook:  document.getElementById('s-facebook').value.trim(),
+    website:   document.getElementById('s-website').value.trim(),
+  };
+
+  const slugVal = document.getElementById('slug').value.trim() || 'slug';
+  const html = buildHTML(artist, title, type, coverSrc || 'cover.jpg', primary, orb2, darkBg, links, socials, slugVal);
+  const previewHTML = coverSrc ? html.split('cover.jpg').join(coverSrc) : html;
+
+  const frame = document.getElementById('previewFrame');
+  frame.srcdoc = previewHTML;
+  document.getElementById('previewEmpty').style.display = 'none';
+  document.getElementById('phoneMockup').style.display = 'block';
+  updatePhoneScale();
+}
+async function generate() {
+  const artist = document.getElementById('artist').value.trim() || 'VIQ';
+  const title  = document.getElementById('title').value.trim();
+  const type   = document.getElementById('type').value;
+  const slug   = document.getElementById('slug').value.trim();
+
+  if (!title) { alert('Donne un titre à ta chanson !'); return; }
+  if (!slug)  { alert('Le slug URL est vide !'); return; }
+
+  // Cover
+  const coverSrc = coverFile ? await fileToDataURL(coverFile) : null;
+
+  // Color extraction
+  let primary = '#ff6b1a';
+  if (coverSrc) {
+    primary = await extractColor(coverSrc);
+  }
+  const orb2   = shiftHue(primary, -35);
+  const darkBg = darken(primary, 0.08);
+
+  // Links — on lit tous les inputs actifs (même disabled pour sécurité)
+  const links = PLATFORMS
+    .filter(p => {
+      const btn = document.querySelector(`.platform-toggle[data-id="${p.id}"]`);
+      return btn && btn.classList.contains('active');
+    })
+    .map(p => {
+      const input = document.getElementById(`link-${p.id}`);
+      // Forcer la lecture même si disabled
+      const url = (input ? input.value.trim() : '') || '#';
+      return { platform: { id: p.id, url }, label: p.label, action: p.action, color: p.color, bg: p.bg };
+    });
+
+  // Socials
+  const socials = {
+    instagram: document.getElementById('s-instagram').value.trim(),
+    tiktok:    document.getElementById('s-tiktok').value.trim(),
+    facebook:  document.getElementById('s-facebook').value.trim(),
+    website:   document.getElementById('s-website').value.trim(),
+  };
+
+  // Build HTML
+  generatedHTML = buildHTML(artist, title, type, coverSrc, primary, orb2, darkBg, links, socials, slug);
+  generatedSlug = slug;
+
+  // Show preview (inline cover for iframe)
+  let previewHTML = generatedHTML;
+  if (coverSrc) {
+    previewHTML = previewHTML.split('cover.jpg').join(coverSrc);
+}
+
+  const frame = document.getElementById('previewFrame');
+  frame.srcdoc = previewHTML;
+  document.getElementById('previewEmpty').style.display = 'none';
+  document.getElementById('phoneMockup').style.display = 'block';
+  updatePhoneScale();
+  document.getElementById('btnDownload').classList.add('visible');
+
+  // Generate + show OG preview
+  updateOGPreview(artist, title, type, coverSrc, primary);
+
+  // Modal
+  document.getElementById('modalUrl').textContent = `sodanexus.github.io/releases/${slug}`;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function fileToDataURL(file) {
+  return new Promise(resolve => {
+    const r = new FileReader();
+    r.onload = e => resolve(e.target.result);
+    r.readAsDataURL(file);
+  });
+}
+
+function formatBytes(bytes){
+  if (!bytes && bytes !== 0) return '';
+  const units = ['B','KB','MB','GB'];
+  let i = 0;
+  let n = bytes;
+  while (n >= 1024 && i < units.length-1){
+    n = n / 1024;
+    i++;
+  }
+  return (n >= 10 || i === 0 ? n.toFixed(0) : n.toFixed(1)) + units[i];
+}
+
+async function processCover(file){
+  // Resize + compress to 1000x1000 JPEG (center-crop to square)
+  const MAX = 1000;
+
+  const dataURL = await fileToDataURL(file);
+  const img = new Image();
+
+  await new Promise((resolve, reject) => {
+    img.onload = resolve;
+    img.onerror = reject;
+    img.src = dataURL;
+  });
+
+  const canvas = document.createElement('canvas');
+  canvas.width = MAX;
+  canvas.height = MAX;
+  const ctx = canvas.getContext('2d');
+
+  // Center-crop to square
+  const side = Math.min(img.width, img.height);
+  const sx = Math.floor((img.width - side) / 2);
+  const sy = Math.floor((img.height - side) / 2);
+
+  // Draw cropped square into 1000x1000
+  ctx.drawImage(img, sx, sy, side, side, 0, 0, MAX, MAX);
+
+  // Export as JPEG
+  const quality = 0.85;
+
+  const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', quality));
+  if (!blob) throw new Error('Compression failed');
+
+  const optimizedFile = new File([blob], 'cover.jpg', { type: 'image/jpeg' });
+  return { optimizedFile, optimizedDataURL: canvas.toDataURL('image/jpeg', quality), originalBytes: file.size, optimizedBytes: optimizedFile.size };
+}
+
+// ── Download ZIP ──────────────────────────────────────────────────────────────
+async function downloadZip() {
+  if (!generatedHTML) return;
+
+  const zip = new JSZip();
+  const folder = zip.folder(generatedSlug);
+
+  folder.file('index.html', generatedHTML);
+
+  if (coverFile) {
+    const coverData = await fileToArrayBuffer(coverFile);
+    const ext = coverFile.name.split('.').pop() || 'jpg';
+    folder.file(`cover.${ext}`, coverData);
+    // Si l'extension n'est pas jpg, on génère quand même cover.jpg comme alias
+    // (le HTML pointe vers cover.jpg donc on renomme)
+    if (ext.toLowerCase() !== 'jpg') {
+      folder.file('cover.jpg', coverData);
+    }
+  }
+
+  // OG image JPEG
+  try {
+    const artist  = document.getElementById('artist').value.trim() || 'VIQ';
+    const title   = document.getElementById('title').value.trim() || 'Track';
+    const type    = document.getElementById('type').value;
+    let ogPrimary = '#ff6b1a';
+    if (coverDataURL) { try { ogPrimary = await extractColor(coverDataURL); } catch(_) {} }
+    const ogDataURL = await generateOGImage(artist, title, type, coverDataURL || null, ogPrimary);
+    const base64 = ogDataURL.split(',')[1];
+    const binary = atob(base64);
+    const bytes  = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    folder.file('og.jpg', bytes);
+  } catch(e) { console.warn('OG generation failed:', e); }
+
+  const blob = await zip.generateAsync({ type: 'blob' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url;
+  a.download = `${generatedSlug}.zip`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function fileToArrayBuffer(file) {
+  return new Promise(resolve => {
+    const r = new FileReader();
+    r.onload = e => resolve(e.target.result);
+    r.readAsArrayBuffer(file);
+  });
+}
+
+
+// ── Round rect helper ──────────────────────────────────────────────────────────
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+// ── Generate OG image 1200×630 JPEG ──────────────────────────────────────────
+async function generateOGImage(artist, title, type, coverSrc, primaryColor) {
+  return new Promise(resolve => {
+    const W = 1200, H = 630;
+    const canvas = document.createElement('canvas');
+    canvas.width = W; canvas.height = H;
+    const ctx = canvas.getContext('2d');
+
+    function drawFinal(coverImg) {
+      // Background: cover blurred
+      if (coverImg) {
+        ctx.save();
+        ctx.filter = 'blur(40px) saturate(140%) brightness(0.55)';
+        ctx.drawImage(coverImg, -80, -80, W + 160, H + 160);
+        ctx.filter = 'none';
+        ctx.restore();
+      } else {
+        const grad = ctx.createLinearGradient(0, 0, W, H);
+        grad.addColorStop(0, '#0a0500');
+        grad.addColorStop(1, '#1a0a00');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, W, H);
+      }
+
+      // Dark overlay
+      ctx.fillStyle = 'rgba(0,0,0,0.50)';
+      ctx.fillRect(0, 0, W, H);
+
+      // Left: cover art square
+      const coverSize = 420;
+      const coverX = 80;
+      const coverY = (H - coverSize) / 2;
+
+      if (coverImg) {
+        ctx.save();
+        roundRect(ctx, coverX, coverY, coverSize, coverSize, 20);
+        ctx.clip();
+        ctx.drawImage(coverImg, coverX, coverY, coverSize, coverSize);
+        ctx.restore();
+        ctx.save();
+        roundRect(ctx, coverX, coverY, coverSize, coverSize, 20);
+        ctx.strokeStyle = 'rgba(255,255,255,0.18)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // Right text area
+      const textX = coverX + coverSize + 72;
+      const textMaxW = W - textX - 60;
+      const centerY = H / 2;
+
+      // Type badge
+      const badgeText = type.toUpperCase();
+      ctx.font = 'bold 12px Inter, Arial, sans-serif';
+      const badgeW = ctx.measureText(badgeText).width + 32;
+      const badgeH = 28;
+      const badgeY = centerY - 108;
+      ctx.fillStyle = primaryColor;
+      ctx.globalAlpha = 0.92;
+      roundRect(ctx, textX, badgeY, badgeW, badgeH, 6);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 11px Inter, Arial, sans-serif';
+      ctx.fillText(badgeText, textX + 16, badgeY + 18);
+
+      // Artist name
+      ctx.fillStyle = '#ffffff';
+      ctx.shadowColor = 'rgba(0,0,0,0.9)';
+      ctx.shadowBlur = 24;
+      let aSize = 66;
+      ctx.font = `bold ${aSize}px Georgia, serif`;
+      while (ctx.measureText(artist).width > textMaxW && aSize > 28) {
+        aSize -= 3;
+        ctx.font = `bold ${aSize}px Georgia, serif`;
+      }
+      ctx.fillText(artist, textX, centerY - 18);
+
+      // Title
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = 'rgba(255,255,255,0.72)';
+      let tSize = 30;
+      ctx.font = `300 ${tSize}px Inter, Arial, sans-serif`;
+      while (ctx.measureText(title).width > textMaxW && tSize > 14) {
+        tSize -= 2;
+        ctx.font = `300 ${tSize}px Inter, Arial, sans-serif`;
+      }
+      ctx.fillText(title, textX, centerY + 32);
+
+      // Tagline
+      ctx.fillStyle = 'rgba(255,255,255,0.38)';
+      ctx.font = '13px Inter, Arial, sans-serif';
+      ctx.fillText('LISTEN ON ALL PLATFORMS', textX, centerY + 78);
+
+      // Bottom accent bar
+      ctx.fillStyle = primaryColor;
+      ctx.globalAlpha = 0.85;
+      ctx.fillRect(0, H - 5, W, 5);
+      ctx.globalAlpha = 1;
+
+      resolve(canvas.toDataURL('image/jpeg', 0.88));
+    }
+
+    if (coverSrc) {
+      const img = new Image();
+      img.onload = () => drawFinal(img);
+      img.onerror = () => drawFinal(null);
+      img.src = coverSrc;
+    } else {
+      drawFinal(null);
+    }
+  });
+}
+
+// ── Update OG preview in the tool ────────────────────────────────────────────
+async function updateOGPreview(artist, title, type, coverSrc, primary) {
+  try {
+    const dataURL = await generateOGImage(artist, title, type, coverSrc, primary);
+    const img = document.getElementById('ogPreviewImg');
+    const placeholder = document.getElementById('ogPlaceholder');
+    if (img) {
+      img.src = dataURL;
+      img.classList.add('visible');
+    }
+    if (placeholder) placeholder.style.display = 'none';
+    return dataURL;
+  } catch(e) {
+    console.warn('OG preview failed:', e);
+    return null;
+  }
+}
+
+// ── Duplicate config ──────────────────────────────────────────────────────────
+function duplicateConfig() {
+  // Save current state to sessionStorage
+  const cfg = {
+    artist:    document.getElementById('artist').value,
+    type:      document.getElementById('type').value,
+    instagram: document.getElementById('s-instagram').value,
+    tiktok:    document.getElementById('s-tiktok').value,
+    facebook:  document.getElementById('s-facebook').value,
+    website:   document.getElementById('s-website').value,
+  };
+  sessionStorage.setItem('viq_duplicate_cfg', JSON.stringify(cfg));
+
+  // Clear title + slug + links (new song)
+  document.getElementById('title').value = '';
+  document.getElementById('slug').value = '';
+  PLATFORMS.forEach(p => {
+    const input = document.getElementById(`link-${p.id}`);
+    if (input && p.id !== 'store') input.value = '';
+  });
+
+  // Scroll to top
+  document.querySelector('.panel-form').scrollTop = 0;
+
+  // Flash feedback
+  const btn = document.querySelector('.btn-duplicate');
+  if (btn) {
+    const orig = btn.textContent;
+    btn.textContent = '✓ Config dupliquée — remplis le nouveau titre !';
+    btn.style.borderColor = 'var(--success)';
+    btn.style.color = 'var(--success)';
+    setTimeout(() => {
+      btn.textContent = orig;
+      btn.style.borderColor = '';
+      btn.style.color = '';
+    }, 2500);
+  }
+
+  document.getElementById('title').focus();
+}
+
+// ── Restore duplicate cfg on load if present ─────────────────────────────────
+function restoreDuplicateCfg() {
+  const raw = sessionStorage.getItem('viq_duplicate_cfg');
+  if (!raw) return;
+  try {
+    const cfg = JSON.parse(raw);
+    if (cfg.artist)    document.getElementById('artist').value    = cfg.artist;
+    if (cfg.type)      document.getElementById('type').value      = cfg.type;
+    if (cfg.instagram) document.getElementById('s-instagram').value = cfg.instagram;
+    if (cfg.tiktok)    document.getElementById('s-tiktok').value    = cfg.tiktok;
+    if (cfg.facebook)  document.getElementById('s-facebook').value  = cfg.facebook;
+    if (cfg.website)   document.getElementById('s-website').value   = cfg.website;
+    sessionStorage.removeItem('viq_duplicate_cfg');
+  } catch(_) {}
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+}
+
+
+// ── Odesli autofill ──────────────────────────────────────────────────────────
+const ODESLI_TO_PLATFORM = {
+  spotify:      'spotify',
+  appleMusic:   'apple',
+  youtube:      'youtube',
+  youtubeMusic: 'youtubemusic',
+  deezer:       'deezer',
+  soundcloud:   'soundcloud',
+  amazonMusic:  'amazon',
+  tidal:        'tidal',
+  bandcamp:     'bandcamp',
+  pandora:      'pandora',
+  anghami:      'anghami',
+};
+
+async function autofillLinks() {
+  const input = document.getElementById('autofillInput');
+  const status = document.getElementById('autofillStatus');
+  const btnContent = document.getElementById('autofillBtnContent');
+  const btn = document.getElementById('btnAutofill');
+
+  const url = input.value.trim();
+  if (!url) {
+    status.className = 'autofill-status err';
+    status.textContent = 'Colle un lien d\'abord.';
+    return;
+  }
+
+  // Loading state
+  btn.disabled = true;
+  btnContent.innerHTML = '<span class="spinner"></span> Recherche…';
+  status.className = 'autofill-status';
+  status.textContent = 'Interrogation de l\'API Odesli…';
+
+  try {
+    const apiUrl = `https://api.song.link/v1-alpha.1/links?url=${encodeURIComponent(url)}&userCountry=FR`;
+    const res = await fetch(apiUrl);
+    if (!res.ok) throw new Error(`API error ${res.status}`);
+    const data = await res.json();
+
+    const links = data.linksByPlatform || {};
+    let filled = 0;
+    let notFound = [];
+
+    for (const [odesliKey, platformId] of Object.entries(ODESLI_TO_PLATFORM)) {
+      const inputEl = document.getElementById(`link-${platformId}`);
+      if (!inputEl) continue;
+
+      if (links[odesliKey] && links[odesliKey].url) {
+        inputEl.value = links[odesliKey].url;
+        // Activate the toggle if it wasn't
+        const toggleBtn = document.querySelector(`.platform-toggle[data-id="${platformId}"]`);
+        if (toggleBtn && !toggleBtn.classList.contains('active')) {
+          toggleBtn.classList.add('active');
+          toggleBtn.textContent = '✓';
+          inputEl.style.opacity = '1';
+          inputEl.style.pointerEvents = 'auto';
+        }
+        // Trigger validation dot
+        inputEl.dispatchEvent(new Event('input'));
+        filled++;
+      } else {
+        const platformLabel = PLATFORMS.find(p => p.id === platformId)?.label || platformId;
+        notFound.push(platformLabel);
+      }
+    }
+
+    // Also fill title from entity if title field is empty
+    if (data.entitiesByUniqueId) {
+      const firstEntity = Object.values(data.entitiesByUniqueId)[0];
+      if (firstEntity) {
+        const titleEl = document.getElementById('title');
+        const artistEl = document.getElementById('artist');
+        if (titleEl && !titleEl.value.trim() && firstEntity.title) {
+          titleEl.value = firstEntity.title;
+          updateSlug();
+        }
+        if (artistEl && firstEntity.artistName && artistEl.value === 'VIQ') {
+          // Only suggest, don't overwrite if already custom
+        }
+      }
+    }
+
+    schedulePreview();
+
+    status.className = 'autofill-status ok';
+    const missMsg = notFound.length ? ` · Non trouvé : ${notFound.join(', ')}` : '';
+    status.textContent = `✓ ${filled} lien${filled > 1 ? 's' : ''} rempli${filled > 1 ? 's' : ''}${missMsg}`;
+
+  } catch(err) {
+    console.error(err);
+    status.className = 'autofill-status err';
+    status.textContent = 'Erreur API — vérifie que le lien est valide.';
+  } finally {
+    btn.disabled = false;
+    btnContent.textContent = '⚡ Remplir';
+  }
+}
+
+// Allow Enter key on autofill input
+document.addEventListener('DOMContentLoaded', () => {
+  const inp = document.getElementById('autofillInput');
+  if (inp) inp.addEventListener('keydown', e => { if (e.key === 'Enter') autofillLinks(); });
+});
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+initPlatforms();
+wireUrlValidation();
+restoreDuplicateCfg();
+wireLivePreview();
+wireCoverDrop();
+schedulePreview();
+updatePhoneScale();
+</script>
+
+</body>
+</html>
