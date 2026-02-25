@@ -13,8 +13,8 @@
       --surface: #141416;
       --surface2: #1c1c1f;
       --border: rgba(255,255,255,0.07);
-      --accent: #ff6b1a;
-      --accent2: #ff2d55;
+      --accent: #e03535;
+      --accent2: #c0392b;
       --text: #f0ede8;
       --muted: rgba(245,240,235,0.75);
       --success: #30d158;
@@ -2157,11 +2157,11 @@ async function autofillLinks() {
 
   try {
     const targetUrl = 'https://api.song.link/v1-alpha.1/links?url=' + encodeURIComponent(url) + '&userCountry=FR';
-    const isLocal = location.origin === 'null' || location.protocol === 'file:';
-    const apiUrl = isLocal ? 'https://corsproxy.io/?url=' + encodeURIComponent(targetUrl) : targetUrl;
+    const apiUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent(targetUrl);
     const res = await fetch(apiUrl);
     if (!res.ok) throw new Error(`API error ${res.status}`);
-    const data = await res.json();
+    const wrapper = await res.json();
+    const data = JSON.parse(wrapper.contents);
 
     const links = data.linksByPlatform || {};
     let filled = 0;
