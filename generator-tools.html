@@ -689,7 +689,15 @@
 
       <div class="field">
         <label>Slug URL (nom du dossier)</label>
-        <input type="text" id="slug" placeholder="slug" style="font-family:var(--mono);"/>
+        <input type="text" id="slug" placeholder="slug" style="font-family:var(--mono);" oninput="updateFinalUrl()"/>
+      </div>
+
+      <div class="field">
+        <label>Lien final</label>
+        <div style="display:flex;gap:.5rem;align-items:center;">
+          <input type="text" id="finalUrl" readonly placeholder="go.viqmusic.net/..." style="font-family:var(--mono);opacity:.7;cursor:default;flex:1;"/>
+          <button onclick="copyFinalUrl(this)" style="flex-shrink:0;padding:.6rem 1rem;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--mono);font-size:.75rem;cursor:pointer;transition:all .2s;white-space:nowrap;">Copier</button>
+        </div>
       </div>
     </div>
 
@@ -1000,6 +1008,7 @@ function updateSlug() {
     .replace(/-+/g, '-') // Évite les doubles tirets --
     .replace(/^-|-$/g, ''); // Nettoie le début et la fin
   document.getElementById('slug').value = slug;
+  updateFinalUrl();
 }
 
 // ── Cover ─────────────────────────────────────────────────────────────────────
@@ -1948,17 +1957,32 @@ async function generateOGImage(artist, title, type, coverSrc, primaryColor) {
       ctx.fillText(type.toUpperCase(), textX, startY + 32);
       ctx.letterSpacing = '0';
 
-      // Nom artiste — grand, serif
+      // Nom artiste — grand, serif, avec retour à la ligne si trop long
       ctx.fillStyle = '#ffffff';
       ctx.shadowColor = 'rgba(0,0,0,0.8)';
       ctx.shadowBlur = 20;
       let aSize = 88;
       ctx.font = 'bold ' + aSize + 'px Georgia, serif';
-      while (ctx.measureText(artist).width > textMaxW && aSize > 32) {
+      while (ctx.measureText(artist).width > textMaxW && aSize > 48) {
         aSize -= 3;
         ctx.font = 'bold ' + aSize + 'px Georgia, serif';
       }
-      ctx.fillText(artist, textX, startY + 32 + aSize + 10);
+      let artistLines = [artist];
+      if (ctx.measureText(artist).width > textMaxW) {
+        const words = artist.split(' ');
+        const splitIdx = Math.ceil(words.length / 2);
+        let line1 = words.slice(0, splitIdx).join(' ');
+        let line2 = words.slice(splitIdx).join(' ');
+        while ((ctx.measureText(line1).width > textMaxW || ctx.measureText(line2).width > textMaxW) && aSize > 28) {
+          aSize -= 2;
+          ctx.font = 'bold ' + aSize + 'px Georgia, serif';
+        }
+        artistLines = [line1, line2];
+      }
+      artistLines.forEach((line, i) => {
+        ctx.fillText(line, textX, startY + 32 + aSize + 10 + i * (aSize + 6));
+      });
+      const artistBlockH = artistLines.length * (aSize + 6);
       ctx.shadowBlur = 0;
 
       // Titre chanson
@@ -1969,7 +1993,7 @@ async function generateOGImage(artist, title, type, coverSrc, primaryColor) {
         tSize -= 2;
         ctx.font = '300 ' + tSize + 'px Inter, Arial, sans-serif';
       }
-      ctx.fillText(title, textX, startY + 32 + aSize + 10 + tSize + 18);
+      ctx.fillText(title, textX, startY + 32 + artistBlockH + 10 + tSize + 18);
 
       // Tagline minimaliste
       ctx.fillStyle = 'rgba(255,255,255,0.28)';
@@ -2118,12 +2142,10 @@ async function autofillLinks() {
   status.textContent = 'Interrogation de l\'API Odesli…';
 
   try {
-    const targetUrl = 'https://api.song.link/v1-alpha.1/links?url=' + encodeURIComponent(url) + '&userCountry=FR';
-    const apiUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent(targetUrl);
+    const apiUrl = 'https://odesli-proxy.viqmusic-promo.workers.dev/?url=' + encodeURIComponent(url);
     const res = await fetch(apiUrl);
     if (!res.ok) throw new Error(`API error ${res.status}`);
-    const wrapper = await res.json();
-    const data = JSON.parse(wrapper.contents);
+    const data = await res.json();
 
     const links = data.linksByPlatform || {};
     let filled = 0;
@@ -2182,6 +2204,38 @@ async function autofillLinks() {
     btn.disabled = false;
     btnContent.textContent = '⚡ Remplir';
   }
+}
+
+// ── URL finale ───────────────────────────────────────────────────────────────
+function updateFinalUrl() {
+  const slug = document.getElementById('slug').value.trim();
+  const el = document.getElementById('finalUrl');
+  if (!el) return;
+  el.value = slug ? `https://go.viqmusic.net/${slug}` : '';
+}
+
+async function copyFinalUrl(btn) {
+  const url = document.getElementById('finalUrl').value;
+  if (!url) return;
+  try {
+    await navigator.clipboard.writeText(url);
+  } catch(_) {
+    const ta = document.createElement('textarea');
+    ta.value = url;
+    ta.style.position = 'fixed'; ta.style.top = '-1000px';
+    document.body.appendChild(ta); ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+  }
+  const orig = btn.textContent;
+  btn.textContent = '✓ Copié !';
+  btn.style.borderColor = 'var(--success)';
+  btn.style.color = 'var(--success)';
+  setTimeout(() => {
+    btn.textContent = orig;
+    btn.style.borderColor = '';
+    btn.style.color = '';
+  }, 2000);
 }
 
 // Allow Enter key on autofill input
