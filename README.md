@@ -73,7 +73,7 @@ Zero server dependencies. Zero frameworks.
 
 Libraries used:
 - `JSZip` — client-side ZIP generation  
-- `Odesli API` via `corsproxy.io` — link auto-fill  
+- `Odesli API` via `allorigins.win` — link auto-fill  
 - `SimpleIcons CDN` — platform logos  
 
 ---
