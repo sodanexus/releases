@@ -52,9 +52,9 @@ Internal tool to generate music release landing pages, ready to be uploaded to G
 ## 📦 Generated ZIP Structure
 
 [slug]/
-├── index.html ← complete landing page
-├── cover.jpg ← optimized 1000×1000 cover
-└── og.jpg ← 1200×630 OG image for social sharing
+├── index.html       # Complete landing page
+├── cover.jpg        # Optimized 1000×1000 cover
+└── og.jpg           # 1200×630 OG image for social sharing
 
 ---
 
