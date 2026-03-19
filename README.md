@@ -2,7 +2,8 @@
 
 > Repo de déploiement automatique des landing pages de sorties musicales VIQ. Chaque dossier correspond à une release, accessible via `go.viqmusic.net/{slug}`.
 >
-> ⚡ Les fichiers de ce repo sont générés et publiés automatiquement par [generator-tools.html](https://github.com/sodanexus/Release-Royalities-Manager). Ne pas éditer manuellement.
+> ⚡ Les fichiers de ce repo sont générés et publiés automatiquement par le Generator-Tools.
+> Ne pas éditer manuellement.
 
 ![GitHub Pages](https://img.shields.io/badge/hébergement-GitHub%20Pages-black) ![Auto-generated](https://img.shields.io/badge/généré_par-Release_Manager-F55036)
 
