@@ -6,136 +6,31 @@
   <title>404 | VIQ</title>
   <meta name="robots" content="noindex, nofollow"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400&display=swap" rel="stylesheet">
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
     :root{--primary:#ffae00;--card-bg:rgba(0,0,0,0.92);--text:#f5f0eb;--muted:rgba(245,240,235,0.75);}
     html,body{min-height:100%;font-family:'Inter',sans-serif;background:#000;color:var(--text);overflow-x:hidden;}
-
     #particles-canvas{position:fixed;inset:0;z-index:2;pointer-events:none;}
-
-    .page{
-      position:relative;z-index:1;
-      min-height:100dvh;
-      display:flex;flex-direction:column;
-      align-items:center;justify-content:center;
-      padding:2rem 1rem;
-    }
-
-    .card{
-      width:100%;max-width:400px;
-      background:var(--card-bg);
-      backdrop-filter:blur(28px) saturate(160%);
-      border:1px solid rgba(255,255,255,0.09);
-      border-radius:20px;
-      overflow:hidden;
-      box-shadow:0 32px 80px rgba(0,0,0,.7);
-      animation:fadeUp .65s cubic-bezier(.22,1,.36,1) both;
-      padding:2.5rem 2rem 2rem;
-      display:flex;flex-direction:column;
-      align-items:center;
-      text-align:center;
-      gap:1.25rem;
-    }
-
+    .page{position:relative;z-index:1;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem 1rem;}
+    .card{width:100%;max-width:400px;background:var(--card-bg);backdrop-filter:blur(28px) saturate(160%);border:1px solid rgba(255,255,255,0.09);border-radius:20px;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,.7);animation:fadeUp .65s cubic-bezier(.22,1,.36,1) both;padding:2.5rem 2rem 2rem;display:flex;flex-direction:column;align-items:center;text-align:center;gap:1.25rem;}
     @keyframes fadeUp{from{opacity:0;transform:translateY(32px);}to{opacity:1;transform:translateY(0);}}
-
-    .error-code{
-      font-family:'Playfair Display',serif;
-      font-weight:700;
-      font-size:5.5rem;
-      line-height:1;
-      color:var(--primary);
-      letter-spacing:-0.02em;
-      animation:fadeUp .5s cubic-bezier(.22,1,.36,1) both;
-      animation-delay:.1s;
-      opacity:0;
-      position:relative;
-    }
-
-    .error-code::after{
-      content:'404';
-      position:absolute;
-      left:3px;top:0;
-      color:rgba(255,255,255,0.12);
-      clip-path:polygon(0 35%,100% 35%,100% 55%,0 55%);
-      animation:glitch 5s infinite;
-      animation-delay:1.5s;
-    }
-    @keyframes glitch{
-      0%,88%,100%{transform:translateX(0);opacity:0;}
-      90%{transform:translateX(-5px);opacity:1;}
-      93%{transform:translateX(5px);opacity:1;}
-      96%{transform:translateX(-2px);opacity:.6;}
-      98%{transform:translateX(0);opacity:0;}
-    }
-
-    .error-title{
-      font-family:'Playfair Display',serif;
-      font-weight:600;
-      font-size:1.35rem;
-      letter-spacing:.01em;
-      animation:fadeUp .5s cubic-bezier(.22,1,.36,1) both;
-      animation-delay:.2s;
-      opacity:0;
-    }
-
-    .error-sub{
-      font-size:.88rem;
-      color:var(--muted);
-      line-height:1.65;
-      letter-spacing:.02em;
-      animation:fadeUp .5s cubic-bezier(.22,1,.36,1) both;
-      animation-delay:.3s;
-      opacity:0;
-    }
-
-    .divider{
-      width:40px;height:1px;
-      background:rgba(255,255,255,0.12);
-      animation:fadeUp .5s cubic-bezier(.22,1,.36,1) both;
-      animation-delay:.35s;
-      opacity:0;
-    }
-
-    .home-btn{
-      display:inline-flex;align-items:center;gap:.5rem;
-      padding:.65rem 1.5rem;
-      background:var(--primary);
-      color:#000;
-      font-family:'Inter',sans-serif;
-      font-size:.85rem;
-      font-weight:400;
-      letter-spacing:.08em;
-      text-transform:uppercase;
-      text-decoration:none;
-      border-radius:999px;
-      transition:transform .2s, opacity .2s;
-      animation:fadeUp .5s cubic-bezier(.22,1,.36,1) both;
-      animation-delay:.42s;
-      opacity:0;
-    }
+    .error-code{font-family:'Instrument Serif',serif;font-weight:700;font-size:5.5rem;line-height:1;color:var(--primary);letter-spacing:-0.02em;animation:fadeUp .5s cubic-bezier(.22,1,.36,1) both;animation-delay:.1s;opacity:0;position:relative;}
+    .error-code::after{content:'404';position:absolute;left:3px;top:0;color:rgba(255,255,255,0.12);clip-path:polygon(0 35%,100% 35%,100% 55%,0 55%);animation:glitch 5s infinite;animation-delay:1.5s;}
+    @keyframes glitch{0%,88%,100%{transform:translateX(0);opacity:0;}90%{transform:translateX(-5px);opacity:1;}93%{transform:translateX(5px);opacity:1;}96%{transform:translateX(-2px);opacity:.6;}98%{transform:translateX(0);opacity:0;}}
+    .error-title{font-family:'Instrument Serif',serif;font-weight:600;font-size:1.35rem;letter-spacing:.01em;animation:fadeUp .5s cubic-bezier(.22,1,.36,1) both;animation-delay:.2s;opacity:0;}
+    .error-sub{font-size:.88rem;color:var(--muted);line-height:1.65;letter-spacing:.02em;animation:fadeUp .5s cubic-bezier(.22,1,.36,1) both;animation-delay:.3s;opacity:0;}
+    .divider{width:40px;height:1px;background:rgba(255,255,255,0.12);animation:fadeUp .5s cubic-bezier(.22,1,.36,1) both;animation-delay:.35s;opacity:0;}
+    .home-btn{display:inline-flex;align-items:center;gap:.5rem;padding:.65rem 1.5rem;background:var(--primary);color:#000;font-family:'Inter',sans-serif;font-size:.85rem;font-weight:400;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;border-radius:999px;transition:transform .2s, opacity .2s;animation:fadeUp .5s cubic-bezier(.22,1,.36,1) both;animation-delay:.42s;opacity:0;}
     .home-btn:hover{transform:translateY(-2px);opacity:.85;}
     .home-btn svg{width:14px;height:14px;}
-
-    .legal-footer{
-      position:fixed;
-      bottom:calc(14px + env(safe-area-inset-bottom));
-      left:50%;transform:translateX(-50%);
-      font-size:11px;color:rgba(255,255,255,0.45);
-      text-align:center;z-index:20;
-    }
+    .legal-footer{position:fixed;bottom:calc(14px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);font-size:11px;color:rgba(255,255,255,0.45);text-align:center;z-index:20;}
     .legal-footer a{color:rgba(255,255,255,0.55);text-decoration:none;}
     .legal-footer a:hover{color:rgba(255,255,255,0.9);text-decoration:underline;}
-
-    @media(max-width:420px){
-      .card{padding:2rem 1.5rem 1.75rem;}
-      .error-code{font-size:4.5rem;}
-    }
+    @media(max-width:420px){.card{padding:2rem 1.5rem 1.75rem;}.error-code{font-size:4.5rem;}}
   </style>
 </head>
 <body>
-
   <canvas id="particles-canvas"></canvas>
   <div class="page">
     <div class="card">
@@ -149,12 +44,10 @@
       </a>
     </div>
   </div>
-
   <div class="legal-footer">
     <a href="/mentions.html">Legal Notice</a> ·
     <a href="/privacy.html">Privacy Policy</a>
   </div>
-
 <script>
 (function(){
   const canvas = document.getElementById('particles-canvas');
